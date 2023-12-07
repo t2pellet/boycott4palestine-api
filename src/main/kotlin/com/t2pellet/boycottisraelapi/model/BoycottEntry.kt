@@ -3,6 +3,8 @@ package com.t2pellet.boycottisraelapi.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class BoycottEntry(
+    @JsonProperty("id")
+    val id: Number,
     @JsonProperty("name")
     val name: String,
     @JsonProperty("description")

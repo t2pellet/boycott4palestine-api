@@ -39,17 +39,31 @@ class BoycottService {
         return matches.map { match -> results.find { it.name == match.string } as BoycottEntry }
     }
 
+    @Cacheable("boycott")
+    fun get(id: Number): BoycottEntry {
+        val response = client.get().uri("boycotts/$id?populate=*").retrieve()
+        val responseData = response.bodyToMono(String::class.java).block()
+        val responseJson = mapper.reader().readTree(responseData).get("data")
+        return parseBoycottEntry(responseJson)
+    }
+
 
     @Cacheable("names")
     fun getNames(): List<String> {
         return getAll().map { it.name }
     }
 
-    @Cacheable("name")
+    @Cacheable("names")
     fun getNames(name: String): List<String> {
         val names = getNames()
         val matches = FuzzySearch.extractSorted(name, names, { s1, s2 -> FuzzySearch.weightedRatio(s1, s2.take(s1.length)) }, 75).take(5)
         return matches.map { it.string }
+    }
+
+    @Cacheable("name")
+    fun getName(id: Number): String {
+        val entry = get(id)
+        return entry.name
     }
 
     private fun responseToBoycotts(response: ResponseSpec): List<BoycottEntry> {
@@ -63,6 +77,7 @@ class BoycottService {
         val attributes = it.get("attributes") as ObjectNode
         val logo = attributes.get("logo").get("data").get("attributes").get("url")
         attributes.set<JsonNode>("logo", logo)
+        attributes.set<JsonNode>("id", it.get("id"))
         attributes.remove("createdAt")
         attributes.remove("updatedAt")
         attributes.remove("publishedAt")

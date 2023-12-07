@@ -10,19 +10,18 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
-@RequestMapping("/api/boycott")
-class BoycottController(val boycottService: BoycottService) {
+@RequestMapping("/api/names")
+class NamesController(val boycottService: BoycottService) {
 
     @GetMapping("")
-    fun get(@RequestParam name: Optional<String>): List<BoycottEntry> {
-        if (name.isPresent) {
-            return boycottService.get(name.get())
-        }
-        return boycottService.getAll()
+    fun get(@PathVariable name: Optional<String>): List<String> {
+        return if (name.isPresent) {
+            boycottService.getNames(name.get())
+        } else boycottService.getNames()
     }
 
     @GetMapping("{id}")
-    fun get(@PathVariable id: Number): BoycottEntry {
-        return boycottService.get(id)
+    fun getNames(@PathVariable id: Number): String {
+        return boycottService.getName(id)
     }
 }
