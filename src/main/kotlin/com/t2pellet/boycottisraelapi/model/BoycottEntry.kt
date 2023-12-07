@@ -1,26 +1,16 @@
 package com.t2pellet.boycottisraelapi.model
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Entity
-@Table(name = "boycott")
 data class BoycottEntry(
-    @Id
-    @Column
+    @JsonProperty("name")
     val name: String,
-    @Column
+    @JsonProperty("description")
+    val description: String?,
+    @JsonProperty("reason")
     val reason: String,
-    @Column
-    val description: String,
-    @Column
+    @JsonProperty("proof")
     val proof: String,
-    @Column
-    val how: String,
-    @Column
+    @JsonProperty("logo")
     val logo: String,
-    @Column
-    val alternatives: String
 )
