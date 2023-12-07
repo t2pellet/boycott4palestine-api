@@ -1,6 +1,6 @@
 package com.t2pellet.boycottisraelapi.controller
 
-import com.t2pellet.boycottisraelapi.model.BoycottEntry
+import com.t2pellet.boycottisraelapi.model.BoycottName
 import com.t2pellet.boycottisraelapi.service.BoycottService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,14 +14,14 @@ import java.util.*
 class NamesController(val boycottService: BoycottService) {
 
     @GetMapping("")
-    fun get(@PathVariable name: Optional<String>): List<String> {
+    fun get(@RequestParam name: Optional<String>): List<BoycottName> {
         return if (name.isPresent) {
             boycottService.getNames(name.get())
         } else boycottService.getNames()
     }
 
     @GetMapping("{id}")
-    fun getNames(@PathVariable id: Number): String {
+    fun getNames(@PathVariable id: Number): BoycottName {
         return boycottService.getName(id)
     }
 }
