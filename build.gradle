@@ -27,6 +27,7 @@ dependencies {
     implementation 'me.xdrop:fuzzywuzzy:1.1.6'
     implementation 'org.springframework.boot:spring-boot-starter-cache:2.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-webflux:3.1.2'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 }
 
 tasks.withType(KotlinCompile) {
