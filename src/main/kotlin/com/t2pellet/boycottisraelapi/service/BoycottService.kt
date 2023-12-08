@@ -53,8 +53,10 @@ class BoycottService {
 
     @Cacheable("names")
     fun getNames(): List<BoycottName> {
-        val response = client.get().uri("boycotts?fields[0]=name").retrieve()
-        return parse(response, this::parseName)
+        val response = client.get().uri("boycotts?populate=Subsidiary&fields[0]=name").retrieve()
+        val subsidiaries: List<BoycottName> = flatParse(response, this::parseSubsidiaryNames)
+        val names: List<BoycottName> = parse(response, this::parseName)
+        return names + subsidiaries
     }
 
     // TODO : This is really inefficient
@@ -79,6 +81,13 @@ class BoycottService {
         return data.map { parseFn.apply(it) }
     }
 
+    private fun <T> flatParse(response: ResponseSpec, parseFn: Function<JsonNode, List<T>>): List<T> {
+        val responseData = response.bodyToMono(String::class.java).block()
+        val responseJson = mapper.reader().readTree(responseData)
+        val data: List<JsonNode> = responseJson.get("data").toList()
+        return data.flatMap { parseFn.apply(it) }
+    }
+
     private fun parseBoycottEntry(it: JsonNode): BoycottEntry {
         val attributes = it.get("attributes") as ObjectNode
         val logo = attributes.get("logo").get("data").get("attributes").get("url")
@@ -87,6 +96,7 @@ class BoycottService {
         attributes.remove("createdAt")
         attributes.remove("updatedAt")
         attributes.remove("publishedAt")
+        attributes.remove("Subsidiary")
         return mapper.treeToValue(attributes, BoycottEntry::class.java)
     }
 
@@ -97,4 +107,13 @@ class BoycottService {
         node.set<JsonNode>("name", attributes.get("name"))
         return mapper.treeToValue(node, BoycottName::class.java)
     }
+
+    private fun parseSubsidiaryNames(it: JsonNode): List<BoycottName> {
+        val id = it.get("id")
+        val subsidiaries: JsonNode = it.get("attributes").get("Subsidiary")
+        return subsidiaries.map {
+            BoycottName(id.asInt(), it.get("name").asText())
+        }
+    }
+
 }
