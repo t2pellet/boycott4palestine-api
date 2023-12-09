@@ -8,10 +8,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class BarcodeData (
     @JsonProperty("barcode")
     val barcode: String,
-    @JsonProperty("title")
+    @JsonProperty("brand")
     @JsonAlias("company")
     val company: String,
-    @JsonProperty("brand")
+    @JsonProperty("title")
     @JsonAlias("product")
     val product: String
 )

@@ -77,8 +77,9 @@ class BoycottService {
     fun getForBarcode(barcode: BarcodeData): BoycottBarcode {
         val entries = getNames()
         val namesStr = entries.map { it.name }
-        val match = FuzzySearch.extractOne(barcode.company, namesStr) { s1, s2 ->
-            FuzzySearch.ratio(
+        val matchQuery = barcode.company.ifEmpty { barcode.product }
+        val match = FuzzySearch.extractOne(matchQuery, namesStr) { s1, s2 ->
+            FuzzySearch.weightedRatio(
                 s1,
                 s2.take(s1.length)
             )
