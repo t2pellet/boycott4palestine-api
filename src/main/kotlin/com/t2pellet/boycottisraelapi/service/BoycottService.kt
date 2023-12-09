@@ -88,7 +88,7 @@ class BoycottService {
             val idx = namesStr.indexOf(match.string)
             val entry = entries[idx]
             val product = get(entry.id)
-            return BoycottBarcode(barcode.product, product.name, true, product.reason)
+            return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo)
         }
         return BoycottBarcode(barcode.product, barcode.company, false)
     }
