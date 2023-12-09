@@ -3,10 +3,10 @@ package com.t2pellet.boycottisraelapi.service
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.module.kotlin.treeToValue
+import com.t2pellet.boycottisraelapi.model.BoycottBarcode
 import com.t2pellet.boycottisraelapi.model.BoycottEntry
 import com.t2pellet.boycottisraelapi.model.BoycottName
-import io.netty.handler.codec.json.JsonObjectDecoder
+import com.t2pellet.boycottisraelapi.model.BarcodeData
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.Cacheable
@@ -14,7 +14,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec
-import java.util.*
 import java.util.function.Function
 
 @Service
@@ -72,6 +71,25 @@ class BoycottService {
     fun getName(id: Number): BoycottName {
         val entry = get(id)
         return BoycottName(entry.id, entry.name)
+    }
+
+    @Cacheable("barcode")
+    fun getForBarcode(barcode: BarcodeData): BoycottBarcode {
+        val entries = getNames()
+        val namesStr = entries.map { it.name }
+        val match = FuzzySearch.extractOne(barcode.company, namesStr) { s1, s2 ->
+            FuzzySearch.ratio(
+                s1,
+                s2.take(s1.length)
+            )
+        }
+        if (match.score >= 90) {
+            val idx = namesStr.indexOf(match.string)
+            val entry = entries[idx]
+            val product = get(entry.id)
+            return BoycottBarcode(barcode.product, product.name, true, product.reason)
+        }
+        return BoycottBarcode(barcode.product, barcode.company, false)
     }
 
     private fun <T> parse(response: ResponseSpec, parseFn: Function<JsonNode, T>): List<T> {
