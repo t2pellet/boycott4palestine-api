@@ -14,7 +14,6 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 @Service
-@CacheConfig(cacheNames = ["barcodeServiceCache"])
 class BarcodeService(
   val barcodeRepository: BarcodeRepository
 ) {
@@ -25,7 +24,6 @@ class BarcodeService(
         .build()
     val mapper: ObjectMapper = ObjectMapper()
 
-    @Cacheable("barcode")
     fun getBarcodeEntry(barcode: String): BarcodeEntry? {
         // First try with DB
         val dbResult: Optional<BarcodeEntry> = barcodeRepository.findById(barcode)
