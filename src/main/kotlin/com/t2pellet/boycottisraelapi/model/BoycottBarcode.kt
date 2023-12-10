@@ -1,5 +1,8 @@
 package com.t2pellet.boycottisraelapi.model
 
+import com.fasterxml.jackson.annotation.JsonInclude
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class BoycottBarcode(
     val product: String,
     val company: String,

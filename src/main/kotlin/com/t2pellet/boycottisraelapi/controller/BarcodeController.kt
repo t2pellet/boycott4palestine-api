@@ -34,7 +34,10 @@ class BarcodeController(
                 val result = boycottService.getForBarcode(barcodeData)
                 barcodeService.saveBarcode(barcodeData.barcode, result)
                 return result
-            } else return BoycottBarcode(barcodeData.product, barcodeData.company, false)
+            } else {
+                val logo = boycottService.getLogo(barcodeData.company)
+                return BoycottBarcode(barcodeData.product, barcodeData.company, false, null, logo)
+            }
         }
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Barcode not found")
     }

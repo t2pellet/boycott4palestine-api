@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec
 import java.util.function.Function
+import kotlin.math.log
 
 @Service
 @CacheConfig(cacheNames = ["boycottServiceCache"])
@@ -56,7 +57,7 @@ class BoycottService {
     fun get(id: Number): BoycottEntry {
         val response = client.get().uri("boycotts/$id?populate=*").retrieve()
         val responseData = response.bodyToMono(String::class.java).block()
-        val responseJson = mapper.reader().readTree(responseData).get("data")
+        val responseJson = mapper.reader().readTree(responseData).get("data") as ObjectNode
         return parseBoycottEntry(responseJson)
     }
 
@@ -102,7 +103,18 @@ class BoycottService {
             return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
         }
 
-        return BoycottBarcode(barcode.product, barcode.company, false)
+        val logo = getLogo(barcode.company)
+        return BoycottBarcode(barcode.product, barcode.company, false, null, logo)
+    }
+
+    fun getLogo(company: String): String? {
+        val response = WebClient.create("https://autocomplete.clearbit.com/v1/companies/")
+            .get().uri("suggest?query=$company").retrieve().bodyToMono(String::class.java).block()
+        val json = mapper.reader().readTree(response).toList()
+        if (json.isNotEmpty()) {
+            return json[0].get("logo").asText()
+        }
+        return null
     }
 
     private fun <T> parse(response: ResponseSpec, parseFn: Function<JsonNode, T>): List<T> {
