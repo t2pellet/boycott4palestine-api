@@ -1,11 +1,9 @@
 package com.t2pellet.boycottisraelapi.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.t2pellet.boycottisraelapi.repository.BarcodeRepository
 import com.t2pellet.boycottisraelapi.model.BarcodeEntry
 import com.t2pellet.boycottisraelapi.model.BoycottBarcode
-import org.springframework.cache.annotation.CacheConfig
-import org.springframework.cache.annotation.Cacheable
+import com.t2pellet.boycottisraelapi.repository.BarcodeRepository
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -68,4 +66,16 @@ class BarcodeService(
         ))
     }
 
+    fun saveBarcodeCompany(barcode: String, company: String, strapiId: Int? = null): BarcodeEntry? {
+        val entry = barcodeRepository.findById(barcode)
+        if (entry.isPresent) {
+            val data = entry.get()
+            if (data.company.isEmpty()) {
+                val newEntry = BarcodeEntry(data.barcode, company, data.product, strapiId)
+                saveBarcode(newEntry)
+                return newEntry
+            }
+        }
+        return null
+    }
 }

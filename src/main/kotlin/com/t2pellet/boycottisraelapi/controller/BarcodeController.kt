@@ -14,6 +14,8 @@ import org.springframework.web.server.ResponseStatusException
 import com.t2pellet.boycottisraelapi.model.BarcodeData
 import com.t2pellet.boycottisraelapi.model.BarcodeEntry
 import com.t2pellet.boycottisraelapi.model.BoycottEntry
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.RequestParam
 
 @RestController
 @RequestMapping("/api/barcode")
@@ -52,5 +54,18 @@ class BarcodeController(
             barcodeService.saveBarcode(entry)
             return entry
         }
+    }
+
+    @PatchMapping("/{barcode}")
+    fun fixBarcode(@PathVariable barcode: String, @RequestParam company: String): BarcodeEntry {
+        val match: BoycottEntry? = boycottService.getBest(company)
+        if (match != null) {
+            val result = barcodeService.saveBarcodeCompany(barcode, match.name, match.id)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Barcode not found")
+            return result
+        }
+        val result = barcodeService.saveBarcodeCompany(barcode, company)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Barcode not found")
+        return result
     }
 }
