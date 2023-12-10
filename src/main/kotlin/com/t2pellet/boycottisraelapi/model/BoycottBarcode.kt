@@ -8,4 +8,14 @@ data class BoycottBarcode(
     val logo: String? = null,
     val proof: String? = null,
     val id: Int? = null,
-)
+) {
+    constructor(barcode: BarcodeEntry, parent: BoycottEntry): this(
+        barcode.product,
+        parent.name,
+        true,
+        parent.reason,
+        parent.logo,
+        parent.proof,
+        parent.id
+    )
+}

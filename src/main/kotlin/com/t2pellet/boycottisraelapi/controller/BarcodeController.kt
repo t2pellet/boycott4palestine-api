@@ -27,9 +27,15 @@ class BarcodeController(
         val barcodeData = barcodeService.getBarcodeEntry(barcode)
         if (barcodeData != null) {
             val isFromCache = barcodeService.isCachedBarcode(barcodeData.barcode)
-            val barcodeResult = boycottService.getForBarcode(barcodeData, !isFromCache)
-            barcodeService.saveBarcode(barcodeData.barcode, barcodeResult)
-            return barcodeResult
+            if (barcodeData.strapiId != null) {
+                val parent = boycottService.get(barcodeData.strapiId)
+                val result = BoycottBarcode(barcodeData, parent)
+                return result
+            } else if (!isFromCache) {
+                val result = boycottService.getForBarcode(barcodeData)
+                barcodeService.saveBarcode(barcodeData.barcode, result)
+                return result
+            } else return BoycottBarcode(barcodeData.product, barcodeData.company, false)
         }
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Barcode not found")
     }

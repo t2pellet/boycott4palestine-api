@@ -46,7 +46,7 @@ class BoycottService {
         val results = getAll()
         val names = results.map { it.name }
         val match = FuzzySearch.extractOne(name, names) { s1, s2 -> FuzzySearch.weightedRatio(s1, s2) }
-        if (match.score >= 90) {
+        if (match.score >= 75) {
             return results.find { it.name == match.string } as BoycottEntry
         }
         return null
@@ -85,26 +85,21 @@ class BoycottService {
     }
 
     @Cacheable("barcode")
-    fun getForBarcode(barcode: BarcodeEntry, shouldSearch: Boolean = true): BoycottBarcode {
-        if (barcode.strapiId != null) {
-            val product = get(barcode.strapiId)
+    fun getForBarcode(barcode: BarcodeEntry): BoycottBarcode {
+        val entries = getAll()
+        val namesStr = entries.map { it.name }
+        val matchQuery = barcode.company.ifEmpty { barcode.product }
+        val match = FuzzySearch.extractOne(matchQuery, namesStr) { s1, s2 ->
+            FuzzySearch.weightedRatio(
+                s1,
+                s2
+            )
+        }
+        if (match.score >= 75) {
+            val idx = namesStr.indexOf(match.string)
+            val entry = entries[idx]
+            val product = get(entry.id)
             return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
-        } else if (shouldSearch) {
-            val entries = getAll()
-            val namesStr = entries.map { it.name }
-            val matchQuery = barcode.company.ifEmpty { barcode.product }
-            val match = FuzzySearch.extractOne(matchQuery, namesStr) { s1, s2 ->
-                FuzzySearch.weightedRatio(
-                    s1,
-                    s2.take(s1.length)
-                )
-            }
-            if (match.score >= 90) {
-                val idx = namesStr.indexOf(match.string)
-                val entry = entries[idx]
-                val product = get(entry.id)
-                return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
-            }
         }
 
         return BoycottBarcode(barcode.product, barcode.company, false)
