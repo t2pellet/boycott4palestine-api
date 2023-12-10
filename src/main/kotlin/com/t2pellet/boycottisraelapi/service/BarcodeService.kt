@@ -49,6 +49,10 @@ class BarcodeService(
         return null
     }
 
+    fun isCachedBarcode(barcode: String): Boolean {
+        return barcodeRepository.existsById(barcode)
+    }
+
     fun saveBarcode(barcodeEntity: BarcodeEntry) {
         if (!barcodeRepository.existsById(barcodeEntity.barcode)) {
             barcodeRepository.saveAndFlush(barcodeEntity)

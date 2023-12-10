@@ -26,7 +26,8 @@ class BarcodeController(
     fun getBarcode(@PathVariable barcode: String): BoycottBarcode {
         val barcodeData = barcodeService.getBarcodeEntry(barcode)
         if (barcodeData != null) {
-            val barcodeResult = boycottService.getForBarcode(barcodeData)
+            val isFromCache = barcodeService.isCachedBarcode(barcodeData.barcode)
+            val barcodeResult = boycottService.getForBarcode(barcodeData, !isFromCache)
             barcodeService.saveBarcode(barcodeData.barcode, barcodeResult)
             return barcodeResult
         }

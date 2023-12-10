@@ -85,11 +85,11 @@ class BoycottService {
     }
 
     @Cacheable("barcode")
-    fun getForBarcode(barcode: BarcodeEntry): BoycottBarcode {
+    fun getForBarcode(barcode: BarcodeEntry, shouldSearch: Boolean = true): BoycottBarcode {
         if (barcode.strapiId != null) {
             val product = get(barcode.strapiId)
             return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
-        } else {
+        } else if (shouldSearch) {
             val entries = getAll()
             val namesStr = entries.map { it.name }
             val matchQuery = barcode.company.ifEmpty { barcode.product }
