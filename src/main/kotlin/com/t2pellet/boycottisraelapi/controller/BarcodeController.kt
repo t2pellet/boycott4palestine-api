@@ -21,7 +21,9 @@ class BarcodeController(
     fun getBarcode(@PathVariable barcode: String): BoycottBarcode {
         val barcodeData = barcodeService.getBarcodeData(barcode)
         if (barcodeData != null) {
-            return boycottService.getForBarcode(barcodeData)
+            val barcodeResult = boycottService.getForBarcode(barcodeData)
+            barcodeService.saveBarcode(barcodeData.barcode, barcodeResult)
+            return barcodeResult
         }
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Barcode not found")
     }

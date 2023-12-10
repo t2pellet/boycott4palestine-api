@@ -13,5 +13,8 @@ data class BarcodeData (
     val company: String,
     @JsonProperty("title")
     @JsonAlias("product")
-    val product: String
-)
+    val product: String,
+) {
+
+    constructor(entity: BarcodeEntity) : this(entity.barcode, entity.company ?: "", entity.product)
+}

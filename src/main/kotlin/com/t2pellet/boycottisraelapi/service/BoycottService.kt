@@ -88,9 +88,9 @@ class BoycottService {
             val idx = namesStr.indexOf(match.string)
             val entry = entries[idx]
             val product = get(entry.id)
-            return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo)
+            return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
         }
-        return BoycottBarcode(barcode.product, barcode.company, false)
+        return BoycottBarcode(barcode.product, barcode.company ?: "", false)
     }
 
     private fun <T> parse(response: ResponseSpec, parseFn: Function<JsonNode, T>): List<T> {

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class BoycottEntry(
     @JsonProperty("id")
-    val id: Number,
+    val id: Int,
     @JsonProperty("name")
     val name: String,
     @JsonProperty("description")

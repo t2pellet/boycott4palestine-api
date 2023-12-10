@@ -5,5 +5,7 @@ data class BoycottBarcode(
     val company: String,
     val boycott: Boolean,
     val reason: String? = null,
-    val logo: String? = null
+    val logo: String? = null,
+    val proof: String? = null,
+    val id: Int? = null,
 )
