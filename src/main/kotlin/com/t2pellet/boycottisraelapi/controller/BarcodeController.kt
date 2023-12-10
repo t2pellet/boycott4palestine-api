@@ -47,7 +47,7 @@ class BarcodeController(
 
     @PostMapping("")
     fun addBarcode(@RequestBody barcode: BarcodeData): BarcodeEntry {
-        val match: BoycottEntry? = boycottService.getBest(barcode.company) ?: boycottService.getBest(barcode.product)
+        val match: BoycottEntry? = boycottService.getBest(barcode.company.ifEmpty { barcode.product })
         if (match != null) {
             val entry = BarcodeEntry(barcode.barcode, barcode.company, barcode.product, match.id)
             barcodeService.saveBarcode(entry)

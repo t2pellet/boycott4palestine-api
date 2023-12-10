@@ -72,7 +72,7 @@ class BarcodeService(
             val data = entry.get()
             if (data.company.isEmpty()) {
                 val newEntry = BarcodeEntry(data.barcode, company, data.product, strapiId)
-                saveBarcode(newEntry)
+                barcodeRepository.saveAndFlush(newEntry)
                 return newEntry
             }
         }
