@@ -34,12 +34,16 @@ class BarcodeController(
     }
 
     @PostMapping("")
-    fun addBarcode(@RequestBody barcode: BarcodeData) {
+    fun addBarcode(@RequestBody barcode: BarcodeData): BarcodeEntry {
         val match: BoycottEntry? = boycottService.getBest(barcode.company) ?: boycottService.getBest(barcode.product)
         if (match != null) {
-            barcodeService.saveBarcode(BarcodeEntry(barcode.barcode, barcode.company, barcode.product, match.id))
+            val entry = BarcodeEntry(barcode.barcode, barcode.company, barcode.product, match.id)
+            barcodeService.saveBarcode(entry)
+            return entry
         } else {
-            barcodeService.saveBarcode(BarcodeEntry(barcode.barcode, barcode.company, barcode.product))
+            val entry = BarcodeEntry(barcode.barcode, barcode.company, barcode.product)
+            barcodeService.saveBarcode(entry)
+            return entry
         }
     }
 }

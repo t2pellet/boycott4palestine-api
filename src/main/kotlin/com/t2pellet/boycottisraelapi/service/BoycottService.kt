@@ -90,7 +90,7 @@ class BoycottService {
             val product = get(barcode.strapiId)
             return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
         } else {
-            val entries = getNames()
+            val entries = getAll()
             val namesStr = entries.map { it.name }
             val matchQuery = barcode.company.ifEmpty { barcode.product }
             val match = FuzzySearch.extractOne(matchQuery, namesStr) { s1, s2 ->
