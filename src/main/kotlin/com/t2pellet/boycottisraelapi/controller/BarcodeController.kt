@@ -33,7 +33,7 @@ class BarcodeController(
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Barcode not found")
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     fun addBarcode(@RequestBody barcode: BarcodeData) {
         val match: BoycottEntry? = boycottService.getBest(barcode.company) ?: boycottService.getBest(barcode.product)
         if (match != null) {
