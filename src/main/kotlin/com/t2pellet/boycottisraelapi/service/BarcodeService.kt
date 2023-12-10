@@ -2,7 +2,7 @@ package com.t2pellet.boycottisraelapi.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.t2pellet.boycottisraelapi.repository.BarcodeRepository
-import com.t2pellet.boycottisraelapi.model.BarcodeData
+import com.t2pellet.boycottisraelapi.model.BarcodeEntry
 import com.t2pellet.boycottisraelapi.model.BoycottBarcode
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.Cacheable
@@ -26,9 +26,9 @@ class BarcodeService(
     val mapper: ObjectMapper = ObjectMapper()
 
     @Cacheable("barcode")
-    fun getBarcodeData(barcode: String): BarcodeData? {
+    fun getBarcodeEntry(barcode: String): BarcodeEntry? {
         // First try with DB
-        val dbResult: Optional<BarcodeData> = barcodeRepository.findById(barcode)
+        val dbResult: Optional<BarcodeEntry> = barcodeRepository.findById(barcode)
         if (dbResult.isPresent) {
             return dbResult.get()
         }
@@ -45,18 +45,20 @@ class BarcodeService(
         if (response != null) {
             val jsonData = mapper.reader().readTree(response)
             if (jsonData.get("success").asBoolean()) {
-                return mapper.convertValue(jsonData, BarcodeData::class.java)
+                return mapper.convertValue(jsonData, BarcodeEntry::class.java)
             }
         }
         return null
     }
 
-    fun saveBarcode(barcodeEntity: BarcodeData) {
-        barcodeRepository.saveAndFlush(barcodeEntity)
+    fun saveBarcode(barcodeEntity: BarcodeEntry) {
+        if (!barcodeRepository.existsById(barcodeEntity.barcode)) {
+            barcodeRepository.saveAndFlush(barcodeEntity)
+        }
     }
 
     fun saveBarcode(barcode: String, barcodeData: BoycottBarcode) {
-        saveBarcode(BarcodeData(
+        saveBarcode(BarcodeEntry(
             barcode,
             barcodeData.product,
             barcodeData.company,
