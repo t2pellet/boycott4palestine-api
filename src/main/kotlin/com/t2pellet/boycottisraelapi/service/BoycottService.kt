@@ -75,22 +75,28 @@ class BoycottService {
 
     @Cacheable("barcode")
     fun getForBarcode(barcode: BarcodeData): BoycottBarcode {
-        val entries = getNames()
-        val namesStr = entries.map { it.name }
-        val matchQuery = barcode.company.ifEmpty { barcode.product }
-        val match = FuzzySearch.extractOne(matchQuery, namesStr) { s1, s2 ->
-            FuzzySearch.weightedRatio(
-                s1,
-                s2.take(s1.length)
-            )
-        }
-        if (match.score >= 90) {
-            val idx = namesStr.indexOf(match.string)
-            val entry = entries[idx]
-            val product = get(entry.id)
+        if (barcode.strapiId != null) {
+            val product = get(barcode.strapiId)
             return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
+        } else {
+            val entries = getNames()
+            val namesStr = entries.map { it.name }
+            val matchQuery = barcode.company.ifEmpty { barcode.product }
+            val match = FuzzySearch.extractOne(matchQuery, namesStr) { s1, s2 ->
+                FuzzySearch.weightedRatio(
+                    s1,
+                    s2.take(s1.length)
+                )
+            }
+            if (match.score >= 90) {
+                val idx = namesStr.indexOf(match.string)
+                val entry = entries[idx]
+                val product = get(entry.id)
+                return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
+            }
         }
-        return BoycottBarcode(barcode.product, barcode.company ?: "", false)
+
+        return BoycottBarcode(barcode.product, barcode.company, false)
     }
 
     private fun <T> parse(response: ResponseSpec, parseFn: Function<JsonNode, T>): List<T> {

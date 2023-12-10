@@ -11,7 +11,7 @@ data class BarcodeEntity(
     val barcode: String,
     val product: String,
     val company: String?,
-    val strapiId: Int,
+    val strapiId: Int?,
 ) {
     constructor(barcodeData: BarcodeData, strapiId: Int): this(
         barcodeData.barcode,

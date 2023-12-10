@@ -66,7 +66,7 @@ class BarcodeService(
             barcode,
             barcodeData.product,
             barcodeData.company,
-            barcodeData.id as Int,
+            barcodeData.id,
         ))
     }
 
