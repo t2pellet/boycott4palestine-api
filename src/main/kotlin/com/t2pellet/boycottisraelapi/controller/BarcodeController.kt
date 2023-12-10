@@ -1,6 +1,6 @@
 package com.t2pellet.boycottisraelapi.controller
 
-import com.t2pellet.boycottisraelapi.model.BoycottBarcode
+import com.t2pellet.boycottisraelapi.model.*
 import com.t2pellet.boycottisraelapi.service.BarcodeService
 import com.t2pellet.boycottisraelapi.service.BoycottService
 import org.springframework.http.HttpStatus
@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import com.t2pellet.boycottisraelapi.model.BarcodeData
-import com.t2pellet.boycottisraelapi.model.BarcodeEntry
-import com.t2pellet.boycottisraelapi.model.BoycottEntry
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -40,6 +37,12 @@ class BarcodeController(
             } else return BoycottBarcode(barcodeData.product, barcodeData.company, false)
         }
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "Barcode not found")
+    }
+
+    @GetMapping("/exists/{barcode}")
+    fun checkBarcode(@PathVariable barcode: String): BarcodeCheck {
+        val cached = barcodeService.isCachedBarcode(barcode)
+        return BarcodeCheck(barcode, cached)
     }
 
     @PostMapping("")
