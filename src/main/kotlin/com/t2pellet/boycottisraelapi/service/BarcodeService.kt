@@ -60,8 +60,8 @@ class BarcodeService(
     fun saveBarcode(barcode: String, barcodeData: BoycottBarcode) {
         saveBarcode(BarcodeEntry(
             barcode,
-            barcodeData.product,
             barcodeData.company,
+            barcodeData.product,
             barcodeData.id,
         ))
     }

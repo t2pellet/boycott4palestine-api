@@ -21,7 +21,7 @@ data class BarcodeEntry (
     @JsonAlias("brand")
     val company: String,
     @JsonProperty("product")
-    @JsonAlias("product")
+    @JsonAlias("title")
     val product: String,
     @JsonIgnore
     @JsonProperty("strapiId")
