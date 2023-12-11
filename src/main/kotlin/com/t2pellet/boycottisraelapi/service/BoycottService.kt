@@ -3,10 +3,10 @@ package com.t2pellet.boycottisraelapi.service
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.t2pellet.boycottisraelapi.model.BarcodeEntry
 import com.t2pellet.boycottisraelapi.model.BoycottBarcode
 import com.t2pellet.boycottisraelapi.model.BoycottEntry
 import com.t2pellet.boycottisraelapi.model.NameEntry
-import com.t2pellet.boycottisraelapi.model.BarcodeEntry
 import me.xdrop.fuzzywuzzy.FuzzySearch
 import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.Cacheable
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec
 import java.util.function.Function
-import kotlin.math.log
 
 @Service
 @CacheConfig(cacheNames = ["boycottServiceCache"])
@@ -112,7 +111,11 @@ class BoycottService {
             .get().uri("suggest?query=$company").retrieve().bodyToMono(String::class.java).block()
         val json = mapper.reader().readTree(response).toList()
         if (json.isNotEmpty()) {
-            return json[0].get("logo").asText()
+            val logoEntry = json[0];
+            val logoCompany = logoEntry.get("name").asText()
+            if (FuzzySearch.weightedRatio(company, logoCompany) >= 75) {
+                return logoEntry.get("logo").asText()
+            }
         }
         return null
     }
