@@ -35,7 +35,7 @@ class BarcodeController(
                 barcodeService.saveBarcode(barcodeData.barcode, result)
                 return result
             } else {
-                val logo = boycottService.getLogo(barcodeData.company)
+                val logo = if (barcodeData.company.isNotEmpty()) boycottService.getLogo(barcodeData.company) else null
                 return BoycottBarcode(barcodeData.product, barcodeData.company, false, null, logo)
             }
         }
