@@ -50,6 +50,9 @@ class BarcodeController(
 
     @PostMapping("")
     fun addBarcode(@RequestBody barcode: BarcodeData): BarcodeEntry {
+        if (barcodeService.isCachedBarcode(barcode.barcode)) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot add an existing entry")
+        }
         val match: BoycottEntry? = boycottService.getBest(barcode.company.ifEmpty { barcode.product })
         if (match != null) {
             val entry = BarcodeEntry(barcode.barcode, barcode.company, barcode.product, match.id)
