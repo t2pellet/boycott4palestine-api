@@ -38,7 +38,7 @@ class BarcodeService(
                 }
             }
             .block()
-        if (response != null) {
+        if (!response.isNullOrEmpty()) {
             val jsonData = mapper.reader().readTree(response)
             if (jsonData.get("success").asBoolean()) {
                 return mapper.convertValue(jsonData, BarcodeEntry::class.java)

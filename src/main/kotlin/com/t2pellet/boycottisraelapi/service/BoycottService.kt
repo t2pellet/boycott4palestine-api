@@ -102,7 +102,7 @@ class BoycottService {
             return BoycottBarcode(barcode.product, product.name, true, product.reason, product.logo, product.proof, product.id)
         }
 
-        val logo = getLogo(barcode.company)
+        val logo = getLogo(matchQuery)
         return BoycottBarcode(barcode.product, barcode.company, false, null, logo)
     }
 
